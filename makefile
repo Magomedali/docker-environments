@@ -1,15 +1,13 @@
 build:
-	docker build --file=app/docker/apache.docker --tag=raport-apache app/docker
-	docker build --file=app/docker/php.docker --tag=raport-php app/docker
+	docker build --file=app/docker/php-apache.docker --tag=raport-php-apache app/docker
 	docker build --file=app/docker/php-cli.docker --tag=raport-php-cli app/docker
 	docker build --file=app/docker/mysql.docker --tag=raport-mysql app/docker
 
 
 run:
 	docker network create app
-	docker run -d --name raport-apache -v ${PWD}/app:/var/www/app -p 8000:80 --network=app raport-apache
-	docker run -d --name raport-php -v ${PWD}/app:/var/www/app --network=app raport-php
-	docker run -d --name raport-mysql -v ${PWD}/app:/app -p 33060:33060 --network=app raport-mysql
+	docker run -d --name raport-php-apache -v ${PWD}/app:/var/www/app -p 8000:80 --network=app raport-php-apache
+	docker run -d --name raport-mysql -v ${PWD}/app:/app -p 33060:3306 --network=app raport-mysql
 
 
 cli:
@@ -18,10 +16,20 @@ cli:
 
 
 down:
-	docker stop raport-apache
+	docker stop raport-php-apache
 	docker stop raport-mysql
-	docker stop raport-php
-	docker rm raport-apache
+	docker rm raport-php-apache
 	docker rm raport-mysql
-	docker rm raport-php
 	docker network remove app
+
+
+pull:
+	docker pull phpmyadmin/phpmyadmin
+
+
+admin-run:
+	docker run -d --name myadmin --link raport-mysql -p 8085:80 --network=app -e MYSQL_ROOT_PASSWORD=12345 -e PMA_HOST=raport-mysql -e PMA_PORT=3306 phpmyadmin/phpmyadmin
+
+admin-down:
+	docker stop myadmin
+	docker rm myadmin
