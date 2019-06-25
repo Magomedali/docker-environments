@@ -27,7 +27,7 @@ cli:
 
 
 cli-bash:
-	docker run -it -v ${PWD}/app:/var/www/app -v env-composer:/root/.composer/cache --network=net-env env-php-cli
+	docker run -it -v ${PWD}/app:/var/www/app -v env-composer:/root/.composer/cache --network=net-env env-php-cli bash
 
 
 
